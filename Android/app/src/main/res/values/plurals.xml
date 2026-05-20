@@ -8,4 +8,8 @@
         <item quantity="one">%d commit</item>
         <item quantity="other">%d commits</item>
     </plurals>
+    <plurals name="notification_sessions_running">
+        <item quantity="one">%d session running</item>
+        <item quantity="other">%d sessions running</item>
+    </plurals>
 </resources>

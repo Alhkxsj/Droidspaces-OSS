@@ -459,6 +459,14 @@
     <string name="grant_permission">Grant Permission</string>
     <string name="i_understand">I Understand</string>
 
+    <!-- Terminal Session Notification -->
+    <string name="notification_title">Droidspaces Terminal</string>
+    <string name="notification_action_exit">EXIT</string>
+    <string name="notification_wakelock_on">Wake lock: ON</string>
+    <string name="notification_wakelock_off">Wake lock: OFF</string>
+    <string name="notification_channel_name">Terminal Sessions</string>
+    <string name="notification_channel_desc">Active container terminal sessions</string>
+
     <!-- Sparse Image Management -->
     <string name="migrate_to_sparse_image">Migrate to a sparse image</string>
     <string name="resize_sparse_image">Resize the sparse image</string>
