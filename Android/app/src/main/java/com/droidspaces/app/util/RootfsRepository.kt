@@ -13,7 +13,6 @@ import java.net.URL
 
 data class RootfsAsset(
     val name: String,
-    val file: String,
     val description: String,
     val architecture: String,
     val downloadUrl: String,
@@ -21,7 +20,26 @@ data class RootfsAsset(
     val buildDate: String,
     val author: String,
     val sourceRepoName: String
-)
+) {
+    // Unique filename derived from metadata - avoids conflicts with generic names like rootfs.tar.xz
+    // Includes a short hash of the download URL to guarantee uniqueness even across repos
+    val uniqueFilename: String get() {
+        val ext = when {
+            downloadUrl.endsWith(".tar.xz") -> ".tar.xz"
+            downloadUrl.endsWith(".tar.gz")  -> ".tar.gz"
+            else -> ".tar.xz"
+        }
+        val sanitized = "$name $author".trim()
+            .replace(Regex("[^a-zA-Z0-9._-]"), "-")
+            .replace(Regex("-{2,}"), "-")
+            .trimEnd('-')
+        val urlHash = java.security.MessageDigest.getInstance("SHA-256")
+            .digest(downloadUrl.toByteArray())
+            .take(4)
+            .joinToString("") { "%02x".format(it) }
+        return "$sanitized-$architecture-$buildDate-$urlHash$ext"
+    }
+}
 
 sealed class RepoResult {
     data class Success(val assets: List<RootfsAsset>) : RepoResult()
@@ -114,7 +132,6 @@ object RootfsRepository {
                 add(
                     RootfsAsset(
                         name           = obj.optString("name", ""),
-                        file           = obj.optString("file", ""),
                         description    = obj.optString("description", ""),
                         architecture   = obj.optString("architecture", ""),
                         downloadUrl    = downloadUrl,

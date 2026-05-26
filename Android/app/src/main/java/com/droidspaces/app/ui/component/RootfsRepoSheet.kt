@@ -179,7 +179,7 @@ fun RootfsRepoSheet(
                                 onDownload     = { vm.startDownload(it) },
                                 onCancel       = { vm.cancelDownload(it) },
                                 onInstall      = { uri -> onInstall(uri) },
-                                onRetry        = { vm.resetAsset(it.file) }
+                                onRetry        = { vm.resetAsset(it.downloadUrl) }
                             )
                         }
                         if (isLoading) {
@@ -281,10 +281,10 @@ private fun RepoListContent(
         contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
         verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
-        items(assets, key = { it.file }) { asset ->
+        items(assets, key = { it.downloadUrl }) { asset ->
             RootfsAssetCard(
                 asset      = asset,
-                state      = downloadStates[asset.file] ?: AssetDownloadState.Idle,
+                state      = downloadStates[asset.downloadUrl] ?: AssetDownloadState.Idle,
                 onDownload = { onDownload(asset) },
                 onCancel   = { onCancel(asset) },
                 onInstall  = onInstall,

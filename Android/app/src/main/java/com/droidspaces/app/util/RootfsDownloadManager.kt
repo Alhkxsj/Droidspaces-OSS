@@ -29,7 +29,7 @@ object RootfsDownloadManager {
      */
     fun enqueue(context: Context, asset: RootfsAsset): Long {
         val dm = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
-        val filename = asset.downloadUrl.substringAfterLast("/")
+        val filename = asset.uniqueFilename
         val destFile = File(
             Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
             filename
@@ -48,7 +48,7 @@ object RootfsDownloadManager {
 
     fun pollFlow(context: Context, asset: RootfsAsset, downloadId: Long): Flow<DownloadStatus> = flow {
         val dm = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
-        val filename = asset.downloadUrl.substringAfterLast("/")
+        val filename = asset.uniqueFilename
         val destFile = File(
             Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
             filename
