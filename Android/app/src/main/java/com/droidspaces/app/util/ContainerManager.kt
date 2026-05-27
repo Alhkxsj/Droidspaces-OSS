@@ -15,7 +15,8 @@ enum class ContainerStatus {
 
 data class BindMount(
     val src: String,
-    val dest: String
+    val dest: String,
+    val ro: Boolean = false
 )
 
 data class PortForward(
@@ -72,7 +73,7 @@ data class ContainerInfo(
         appendLine("selinux_permissive=${if (selinuxPermissive) "1" else "0"}")
         appendLine("volatile_mode=${if (volatileMode) "1" else "0"}")
         if (bindMounts.isNotEmpty()) {
-            appendLine("bind_mounts=${bindMounts.joinToString(",") { "${it.src}:${it.dest}" }}")
+            appendLine("bind_mounts=${bindMounts.joinToString(",") { "${it.src}:${it.dest}${if (it.ro) ":ro" else ""}" }}")
         }
         if (netMode == "nat" && upstreamInterfaces.isNotEmpty()) {
             appendLine("upstream_interfaces=${upstreamInterfaces.joinToString(",")}")
@@ -251,8 +252,12 @@ object ContainerManager {
 
             // Parse bind mounts: src:dest,src2:dest2
             val bindMounts = configMap["bind_mounts"]?.split(",")?.mapNotNull {
-                val parts = it.split(":", limit = 2)
-                if (parts.size == 2) BindMount(parts[0], parts[1]) else null
+                val parts = it.split(":", limit = 3)
+                when (parts.size) {
+                    2 -> BindMount(parts[0], parts[1])
+                    3 -> BindMount(parts[0], parts[1], ro = parts[2].trim() == "ro")
+                    else -> null
+                }
             } ?: emptyList()
 
             // Parse upstream interfaces

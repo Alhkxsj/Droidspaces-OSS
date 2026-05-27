@@ -250,6 +250,7 @@
     <string name="container_path_placeholder">e.g. /mnt/sdcard</string>
     <string name="host_path">Host path: %1$s</string>
     <string name="container_path">Container path: %1$s</string>
+    <string name="read_only">Read-only</string>
     <string name="dns_servers_label">DNS Servers</string>
     <string name="dns_servers_placeholder">e.g. 1.1.1.1,8.8.8.8 (Optional)</string>
     <string name="dns_servers_hint">Numbers, dots, and colons only</string>

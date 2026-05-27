@@ -133,6 +133,7 @@ fun ContainerConfigScreen(
 
     if (showDestDialog) {
         var destPath by remember { mutableStateOf("") }
+        var roEnabled by remember { mutableStateOf(false) }
         val clearFocus = com.droidspaces.app.ui.util.rememberClearFocus()
         Dialog(
             onDismissRequest = { showDestDialog = false },
@@ -164,6 +165,14 @@ fun ContainerConfigScreen(
                             focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
                         )
                     )
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(context.getString(R.string.read_only), style = MaterialTheme.typography.bodyMedium)
+                        Switch(checked = roEnabled, onCheckedChange = { roEnabled = it })
+                    }
                     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                         Surface(
                             modifier = Modifier.weight(1f).clip(RoundedCornerShape(14.dp)).clickable(onClick = { clearFocus(); showDestDialog = false }),
@@ -182,7 +191,7 @@ fun ContainerConfigScreen(
                                 onClick = {
                                     clearFocus()
                                     if (destPath.isNotBlank()) {
-                                        bindMounts = bindMounts + BindMount(tempSrcPath, destPath)
+                                        bindMounts = bindMounts + BindMount(tempSrcPath, destPath, roEnabled)
                                         showDestDialog = false
                                     }
                                 }
@@ -785,6 +794,20 @@ fun ContainerConfigScreen(
                                 overflow = TextOverflow.Ellipsis,
                                 maxLines = 1
                             )
+                            if (mount.ro) {
+                                Surface(
+                                    shape = RoundedCornerShape(6.dp),
+                                    color = MaterialTheme.colorScheme.secondaryContainer,
+                                    modifier = Modifier.padding(top = 4.dp)
+                                ) {
+                                    Text(
+                                        text = context.getString(R.string.read_only),
+                                        style = MaterialTheme.typography.labelSmall,
+                                        color = MaterialTheme.colorScheme.onSecondaryContainer,
+                                        modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                                    )
+                                }
+                            }
                         }
                         IconButton(onClick = {
                             bindMounts = bindMounts - mount
