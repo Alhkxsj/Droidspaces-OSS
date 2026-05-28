@@ -105,6 +105,12 @@ if $TEST -f "$ROOTFS_PATH/usr/bin/systemctl" || $TEST -f "$ROOTFS_PATH/bin/syste
 
     log "Systemd detected (at $GUEST_SYSTEMD_PATH), applying fixes..."
 
+    # 00. Pre-commit machine-id to prevent first-boot deadlock in Fedora 44
+    log "Generating machine-id..."
+    $CAT /proc/sys/kernel/random/uuid | $BB tr -d '-' | $BB tr -d '\n' > "$ROOTFS_PATH/etc/machine-id"
+    $ECHO "" >> "$ROOTFS_PATH/etc/machine-id"
+    $CHMOD 444 "$ROOTFS_PATH/etc/machine-id"
+
     # 01. Mask problematic services for Android kernels
     log "Masking problematic systemd services..."
     # Mask systemd-networkd-wait-online.service
