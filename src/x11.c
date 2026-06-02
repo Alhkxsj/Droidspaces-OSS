@@ -231,6 +231,7 @@ static pid_t spawn_xserver(int uid, const char *display) {
 
     char path[PATH_MAX];
     snprintf(path, sizeof(path), "%s/x11.log", get_logs_dir());
+    rotate_log(path, 2 * 1024 * 1024);
     int log_fd = open(path, O_WRONLY | O_CREAT | O_APPEND | O_CLOEXEC, 0644);
     if (log_fd < 0) {
       close(pipefd[0]);
