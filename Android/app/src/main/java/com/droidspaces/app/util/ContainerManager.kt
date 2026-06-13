@@ -44,6 +44,7 @@ data class ContainerInfo(
     val bindMounts: List<BindMount> = emptyList(),
     val dnsServers: String = "",
     val runAtBoot: Boolean = false,
+    val runAtBootPriority: Int = 0,
     val status: ContainerStatus = ContainerStatus.STOPPED,
     val pid: Int? = null,
     val useSparseImage: Boolean = false,
@@ -92,6 +93,9 @@ data class ContainerInfo(
             appendLine("dns_servers=$dnsServers")
         }
         appendLine("run_at_boot=${if (runAtBoot) "1" else "0"}")
+        if (runAtBoot && runAtBootPriority > 0) {
+            appendLine("run_at_boot_priority=$runAtBootPriority")
+        }
         appendLine("force_cgroupv1=${if (forceCgroupv1) "1" else "0"}")
         appendLine("block_nested_ns=${if (blockNestedNs) "1" else "0"}")
         if (netMode == "nat" && staticNatIp.isNotEmpty()) {
@@ -302,6 +306,7 @@ object ContainerManager {
                 bindMounts = bindMounts,
                 dnsServers = configMap["dns_servers"] ?: "",
                 runAtBoot = configMap["run_at_boot"] == "1",
+                runAtBootPriority = configMap["run_at_boot_priority"]?.toIntOrNull() ?: 0,
                 status = ContainerStatus.STOPPED,
                 useSparseImage = useSparseImage,
                 sparseImageSizeGB = sparseImageSizeGB,

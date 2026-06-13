@@ -202,6 +202,11 @@
     <string name="selinux_permissive_description">Set SELinux permissive</string>
     <string name="run_at_boot">Run at Boot</string>
     <string name="run_at_boot_description">Start container on boot</string>
+    <string name="auto_boot_priority">Auto Boot Priority</string>
+    <string name="auto_boot_priority_description">Order in which run-at-boot containers start</string>
+    <string name="auto_boot_priority_hint">Drag to reorder. Containers start top to bottom - put a gateway (e.g. OpenWRT) first so it boots before the containers that route through it.</string>
+    <string name="auto_boot_priority_empty">No containers have Run at Boot enabled.</string>
+    <string name="reorder_handle">Drag to reorder</string>
     <string name="force_cgroupv1">Force Cgroup V1</string>
     <string name="force_cgroupv1_description">Force use of legacy Cgroup V1 hierarchy</string>
     <string name="manual_deadlock_shield">Manual Deadlock Shield</string>
