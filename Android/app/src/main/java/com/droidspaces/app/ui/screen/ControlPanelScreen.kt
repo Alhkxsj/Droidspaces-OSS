@@ -55,13 +55,7 @@ fun ControlPanelScreen(
     // AND the app is in the foreground (Lifecycle STARTED).  repeatOnLifecycle
     // cancels the loop on background / tab-away and restarts it on return, so
     // re-opening the app on the Panel tab resumes polling without a tab switch.
-    LaunchedEffect(Unit) {
-        lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-            systemStatsViewModel.monitorSystem()
-        }
-    }
-
-    // Container loop restarts whenever the running container set changes.
+    // Restarts whenever the running container set changes.
     LaunchedEffect(runningContainers) {
         lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
             systemStatsViewModel.monitorContainers(runningContainers)

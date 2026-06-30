@@ -2,12 +2,8 @@ package com.droidspaces.app.ui.viewmodel
 
 import android.app.Application
 import android.util.Log
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.lifecycle.AndroidViewModel
-import com.droidspaces.app.util.AndroidSystemStatsCollector
 import com.droidspaces.app.util.ContainerInfo
 import com.droidspaces.app.util.ContainerOSInfoManager
 import kotlinx.coroutines.Dispatchers
@@ -15,8 +11,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 
 /**
- * Holds host + per-container stats and exposes the polling loops as suspend
- * functions.  The loops are NOT self-managed here: the screen drives them via
+ * Holds per-container stats and exposes the polling loop as a suspend function.
+ * The loop is NOT self-managed here: the screen drives it via
  * repeatOnLifecycle(STARTED), so polling runs only while the Panel tab is
  * actually on screen AND the app is in the foreground, and is cancelled
  * structurally when either stops being true.  This avoids the old
@@ -27,33 +23,12 @@ class SystemStatsViewModel(application: Application) : AndroidViewModel(applicat
 
     companion object {
         private const val TAG = "SystemStatsViewModel"
-        private const val SYSTEM_INTERVAL_MS = 2000L
         private const val CONTAINER_INTERVAL_MS = 2000L
     }
-
-    var systemUsage by mutableStateOf(AndroidSystemStatsCollector.SystemUsage())
-        private set
 
     // Per-container OS info (containerName -> OSInfo) — single source of truth for all UI
     var containerUsageMap = mutableStateMapOf<String, ContainerOSInfoManager.OSInfo>()
         private set
-
-    /**
-     * Poll host system usage every [SYSTEM_INTERVAL_MS] until the caller's
-     * coroutine is cancelled (e.g. the screen leaves STARTED).
-     */
-    suspend fun monitorSystem() {
-        while (true) {
-            try {
-                systemUsage = withContext(Dispatchers.IO) {
-                    AndroidSystemStatsCollector.collectUsage()
-                }
-            } catch (e: Exception) {
-                Log.e(TAG, "Failed to collect system usage", e)
-            }
-            delay(SYSTEM_INTERVAL_MS)
-        }
-    }
 
     /**
      * Poll OS info for every running container until cancelled.  Returns
