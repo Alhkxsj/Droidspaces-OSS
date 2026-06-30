@@ -952,8 +952,17 @@ static int gateway_ensure_lan_uplink_locked(struct ds_config *cfg,
    * authority on the delegated network. */
   if (!ds_nl_link_exists(ctx, bridge)) {
     ds_log("[NET] Gateway: creating delegated LAN bridge %s", bridge);
-    if (ds_nl_create_bridge(ctx, bridge) < 0) {
-      ds_warn("[NET] Gateway: failed to create bridge %s", bridge);
+    int br = ds_nl_create_bridge(ctx, bridge);
+    if (br < 0) {
+      /* Bail before any veth/netns work.  This should be unreachable - the
+       * startup capability probe (enforce_nat_safety) refuses gateway mode on
+       * a kernel without CONFIG_BRIDGE - but recognise EOPNOTSUPP explicitly
+       * so we never cascade into further unsupported operations. */
+      if (br == -EOPNOTSUPP)
+        ds_warn("[NET] Gateway: kernel lacks CONFIG_BRIDGE - cannot wire "
+                "delegated LAN (gateway mode requires bridge support)");
+      else
+        ds_warn("[NET] Gateway: failed to create bridge %s", bridge);
       ds_nl_close(ctx);
       return -1;
     }
