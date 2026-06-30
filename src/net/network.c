@@ -1779,16 +1779,18 @@ static void *route_monitor_loop(void *arg) {
   struct pollfd pfd = {.fd = sock, .events = POLLIN};
 
   while (!g_stop_monitor) {
-    /* Enforce IPv4 forwarding in real-time. Since Android kernels do not
-     * broadcast POLLERR/inotify events for /proc/sys/ memory variables,
-     * we must check it periodically. Reading a 1-byte procfs memory flag
-     * takes < 1 microsecond, costing 0% CPU. */
-    if (is_android() && g_current_gw_table > 0) {
+    /* Enforce IPv4 forwarding in real-time. If ip_forward ever flips to 0
+     * the NAT'd container loses all WAN traffic, so re-assert it on every
+     * cycle regardless of platform - Android's netd is the usual culprit,
+     * but a desktop firewall/sysctl reload or another tool can clear it too.
+     * The kernel does not broadcast POLLERR/inotify events for /proc/sys/
+     * memory variables, so we must poll; reading a 1-byte procfs flag takes
+     * < 1 microsecond, costing 0% CPU. */
+    if (g_current_gw_table > 0) {
       char val[4] = {0};
       if (read_file("/proc/sys/net/ipv4/ip_forward", val, sizeof(val)) > 0 &&
           val[0] == '0') {
-        ds_log("[NET] Route monitor: ip_forward was disabled by Android, "
-               "re-enabling...");
+        ds_log("[NET] Route monitor: ip_forward was disabled - re-enabling...");
         write_file("/proc/sys/net/ipv4/ip_forward", "1\n");
       }
     }
