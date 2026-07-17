@@ -38,15 +38,7 @@ jobs:
         sudo apt update
         sudo apt install -y build-essential wget tree zstd
 
-    - name: Cache Toolchains
-      id: cache-toolchains
-      uses: actions/cache@v4
-      with:
-        path: ~/toolchains
-        key: toolchains-compilers-25843896720
-
     - name: Download Toolchains
-      if: steps.cache-toolchains.outputs.cache-hit != 'true'
       run: |
         mkdir -p $HOME/toolchains
         cd $HOME/toolchains
